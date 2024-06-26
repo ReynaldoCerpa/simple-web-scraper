@@ -2,3 +2,4 @@ venv/
 Lib/
 Scripts/
 pyvenv.cfg
+output/
