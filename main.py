@@ -34,9 +34,18 @@ def extract_reviews(driver, num_reviews):
                 container = review_containers[i]
                 user_element = container.find_element(By.CLASS_NAME, 'TSUbDb')
                 try:
+                    if container.find_element(By.CLASS_NAME, 'review-more-link'):
+                        mas_button = container.find_element(By.CLASS_NAME, 'review-more-link')
+                        mas_button.click()
+                except:
+                    pass
+
+                try:
+                    # review-more-link
                     comment_element = container.find_element(By.CLASS_NAME, 'f5axBf')
                 except:
                     comment_element = container.find_element(By.CLASS_NAME, 'Jtu6Td')
+
                 driver.execute_script("arguments[0].scrollIntoView(true);", container)
                 time.sleep(0.2)
                 user = user_element.text
@@ -73,5 +82,6 @@ def scrape_google_reviews(url):
 
 if __name__ == '__main__':
     url = input('Enter URL: ')
+    #url = 'https://www.google.com/search?q=cafe+vainilla&oq=cafe+vainilla&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARBFGD0yBggCEC4YQNIBCDE1MjFqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8#lrd=0x80d88fc9ecbe05e9:0x55c3e664040f1fb7,1,,,,'
     reviews = scrape_google_reviews(url)
     print(f'\nFinished successfully, scraped {len(reviews)} reviews')
