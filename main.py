@@ -13,11 +13,10 @@ def scrape_google_reviews(url):
     # z5jxId
 
     business_name = driver.find_element(By.CLASS_NAME, 'Lhccdd')
-    print(business_name.text.split('\n')[0])
     # Lhccdd
     review_count_element = driver.find_element(By.CLASS_NAME, 'z5jxId')
     num_reviews = int(review_count_element.text.split(' ')[0])
-    time.sleep(10000)
+    time.sleep(1)
 
     # Collect review details
     reviews = []
@@ -60,14 +59,16 @@ def scrape_google_reviews(url):
     # Close the WebDriver
     driver.quit()
 
+    with open(f'{business_name.text}', 'w') as output:
+        writer = csv.writer(output)
+        for item in reviews:
+            writer.writerow([item['user'], item['comment']])
+
     return reviews
 
 # Example usage
-url = 'https://www.google.com/search?q=cafe+vainilla&oq=cafe+vainilla&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARAuGEDSAQgxNTY3ajBqMagCALACAA&sourceid=chrome&ie=UTF-8#lrd=0x80d88fc9ecbe05e9:0x55c3e664040f1fb7,1,,,,'
+fixed_url = 'https://www.google.com/search?q=cafe+vainilla&oq=cafe+vainilla&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARAuGEDSAQgxNTY3ajBqMagCALACAA&sourceid=chrome&ie=UTF-8#lrd=0x80d88fc9ecbe05e9:0x55c3e664040f1fb7,1,,,,'
+url = input('Enter url: ')
 reviews = scrape_google_reviews(url)
-with open('output.csv', 'w') as output:
-    writer = csv.writer(output)
-    for item in reviews:
-        writer.writerow([item['user'], item['comment']])
 # for review in reviews:
 #     print(f"User: {review['user']}, Comment: {review['comment']}")
