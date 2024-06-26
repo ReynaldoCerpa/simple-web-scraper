@@ -13,16 +13,16 @@ def scrape_google_reviews(url):
     review_count_element = driver.find_element(By.CLASS_NAME, 'z5jxId')
     num_reviews = int(review_count_element.text.split(' ')[0])
 
-    # Give some time for the page to load
-    # time.sleep(2000)
-
     # Collect review details
     reviews = []
+    OFFSET = 0
 
     while len(reviews) < num_reviews:
         review_containers = driver.find_elements(By.CLASS_NAME, 'gws-localreviews__google-review')
+        if OFFSET == len(review_containers):
+            break
 
-        for i in range(len(review_containers)):
+        for i in range(OFFSET, len(review_containers)):
             try:
                 container = review_containers[i]
                 user_element = container.find_element(By.CLASS_NAME, 'TSUbDb')
@@ -34,12 +34,10 @@ def scrape_google_reviews(url):
 
                 # Scroll the element into view
                 driver.execute_script("arguments[0].scrollIntoView(true);", container)
-                time.sleep(.5)  # Wait for the scrolling to complete
+                time.sleep(.3)  # Wait for the scrolling to complete
 
                 user = user_element.text
                 comment = comment_element.text
-
-                print(f'{user}: {comment}')
 
                 reviews.append({'user': user, 'comment': comment})
 
@@ -49,8 +47,9 @@ def scrape_google_reviews(url):
                 print(f"Error extracting review: {e}")
 
         # Scroll down to load more reviews
-        driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
-        time.sleep(1)  # Adjust sleep time as necessary
+        #driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
+        OFFSET = len(review_containers)
+        time.sleep(.2)  # Adjust sleep time as necessary
 
     # Close the WebDriver
     driver.quit()
@@ -58,7 +57,7 @@ def scrape_google_reviews(url):
     return reviews
 
 # Example usage
-url = 'https://www.google.com/search?q=cafe+vainilla&sca_esv=cf2d8ca50076abe9&sca_upv=1&sxsrf=ADLYWIIk-JvPOj3AinS-gpclkrMa-6xjww%3A1719329825652&ei=IeR6ZvXDJ6zIkPIP-pioyAw&ved=0ahUKEwi12InciveGAxUsJEQIHXoMCskQ4dUDCA8&uact=5&oq=cafe+vainilla&gs_lp=Egxnd3Mtd2l6LXNlcnAiDWNhZmUgdmFpbmlsbGEyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBxAAGIAEGAoyBxAAGIAEGAoyBxAAGIAEGAoyBxAAGIAEGApIixdQ9AhY-xFwA3gAkAEAmAGIAaABoQuqAQQwLjEzuAEDyAEA-AEBmAIQoALsC8ICExAuGIAEGLADGMcBGA0YjgUYrwHCAgsQABiwAxgIGAoYHsICCxAAGIAEGLADGKIEwgIKECMYgAQYJxiKBcICBBAjGCfCAgsQABiABBiRAhiKBcICCxAuGIAEGJECGIoFwgILEC4YgAQY0QMYxwHCAg4QLhiABBiRAhjUAhiKBcICERAuGIAEGJECGNEDGMcBGIoFwgILEAAYgAQYkgMYigXCAg0QABiABBhDGMkDGIoFwgILEC4YgAQYxwEYrwHCAggQABiABBjJA8ICDRAuGIAEGMcBGAoYrwGYAwDiAwUSATEgQIgGAZAGB5IHBDMuMTOgB7h2&sclient=gws-wiz-serp#lrd=0x80d88fc9ecbe05e9:0x55c3e664040f1fb7,1,,,,'
+url = 'https://www.google.com/search?q=CANNERIA+cerveceria&sca_esv=cf2d8ca50076abe9&sca_upv=1&ei=dNR6Ztn2EJHFkPIP0P6GkAk&ved=0ahUKEwjZgK3i-_aGAxWRIkQIHVC_AZIQ4dUDCBA&uact=5&oq=CANNERIA+cerveceria&gs_lp=Egxnd3Mtd2l6LXNlcnAiE0NBTk5FUklBIGNlcnZlY2VyaWEyEBAuGIAEGMcBGA0YjgUYrwEyCBAAGBYYChgeMggQABiABBiiBDIIEAAYgAQYogQyCBAAGIAEGKIEMggQABiABBiiBDIIEAAYgAQYogQyHxAuGIAEGMcBGA0YjgUYrwEYlwUY3AQY3gQY4ATYAQFIwSVQ3gZYwiNwAXgAkAEAmAHJAaABsA-qAQYwLjExLjG4AQPIAQD4AQH4AQKYAgygApsSqAIAwgIOEC4YgAQYxwEYjgUYrwHCAgcQABiABBgKwgIHEC4YgAQYCsICExAuGIAEGMcBGJgFGJkFGAoYrwHCAg0QLhiABBjHARgKGK8BwgIFEAAYgATCAh0QLhiABBjHARiOBRivARiXBRjcBBjeBBjgBNgBAcICBhAuGAoYHsICCBAuGAUYChgewgIIEAAYBRgKGB7CAgQQABgewgIGEAAYBRgewgICECaYAwa6BgYIARABGBSSBwUwLjkuM6AHimg&sclient=gws-wiz-serp#lrd=0x80d892770ca23585:0x2a93fd7bf8fbe615,1,,,,'
 reviews = scrape_google_reviews(url)
 for review in reviews:
-    print(f"User: {review['user']}, Comment: {review['comment']}\n\n")
+    print(f"User: {review['user']}, Comment: {review['comment']}")
