@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+
+import csv
 import time
 
 def scrape_google_reviews(url):
@@ -8,10 +9,15 @@ def scrape_google_reviews(url):
     driver = webdriver.Chrome()  # Ensure chromedriver is in your PATH or provide the path to the executable
     driver.get(url)
 
-    time.sleep(1)
+    time.sleep(5)
     # z5jxId
+
+    business_name = driver.find_element(By.CLASS_NAME, 'Lhccdd')
+    print(business_name.text.split('\n')[0])
+    # Lhccdd
     review_count_element = driver.find_element(By.CLASS_NAME, 'z5jxId')
     num_reviews = int(review_count_element.text.split(' ')[0])
+    time.sleep(10000)
 
     # Collect review details
     reviews = []
@@ -37,7 +43,7 @@ def scrape_google_reviews(url):
                 time.sleep(.3)  # Wait for the scrolling to complete
 
                 user = user_element.text
-                comment = comment_element.text
+                comment = 'Sin comentarios' if not comment_element.text else comment_element.text
 
                 reviews.append({'user': user, 'comment': comment})
 
@@ -57,7 +63,11 @@ def scrape_google_reviews(url):
     return reviews
 
 # Example usage
-url = 'https://www.google.com/search?q=CANNERIA+cerveceria&sca_esv=cf2d8ca50076abe9&sca_upv=1&ei=dNR6Ztn2EJHFkPIP0P6GkAk&ved=0ahUKEwjZgK3i-_aGAxWRIkQIHVC_AZIQ4dUDCBA&uact=5&oq=CANNERIA+cerveceria&gs_lp=Egxnd3Mtd2l6LXNlcnAiE0NBTk5FUklBIGNlcnZlY2VyaWEyEBAuGIAEGMcBGA0YjgUYrwEyCBAAGBYYChgeMggQABiABBiiBDIIEAAYgAQYogQyCBAAGIAEGKIEMggQABiABBiiBDIIEAAYgAQYogQyHxAuGIAEGMcBGA0YjgUYrwEYlwUY3AQY3gQY4ATYAQFIwSVQ3gZYwiNwAXgAkAEAmAHJAaABsA-qAQYwLjExLjG4AQPIAQD4AQH4AQKYAgygApsSqAIAwgIOEC4YgAQYxwEYjgUYrwHCAgcQABiABBgKwgIHEC4YgAQYCsICExAuGIAEGMcBGJgFGJkFGAoYrwHCAg0QLhiABBjHARgKGK8BwgIFEAAYgATCAh0QLhiABBjHARiOBRivARiXBRjcBBjeBBjgBNgBAcICBhAuGAoYHsICCBAuGAUYChgewgIIEAAYBRgKGB7CAgQQABgewgIGEAAYBRgewgICECaYAwa6BgYIARABGBSSBwUwLjkuM6AHimg&sclient=gws-wiz-serp#lrd=0x80d892770ca23585:0x2a93fd7bf8fbe615,1,,,,'
+url = 'https://www.google.com/search?q=cafe+vainilla&oq=cafe+vainilla&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARAuGEDSAQgxNTY3ajBqMagCALACAA&sourceid=chrome&ie=UTF-8#lrd=0x80d88fc9ecbe05e9:0x55c3e664040f1fb7,1,,,,'
 reviews = scrape_google_reviews(url)
-for review in reviews:
-    print(f"User: {review['user']}, Comment: {review['comment']}")
+with open('output.csv', 'w') as output:
+    writer = csv.writer(output)
+    for item in reviews:
+        writer.writerow([item['user'], item['comment']])
+# for review in reviews:
+#     print(f"User: {review['user']}, Comment: {review['comment']}")
